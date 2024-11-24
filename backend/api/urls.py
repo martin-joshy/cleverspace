@@ -1,0 +1,10 @@
+from rest_framework.routers import DefaultRouter
+from django.urls import include, path
+from .views import TaskViewSet
+
+router = DefaultRouter()
+router.register(r"task", TaskViewSet)
+
+urlpatterns = [
+    path("", include(router.urls)),
+]
