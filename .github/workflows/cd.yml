@@ -18,17 +18,17 @@ jobs:
         sudo docker compose up -d
     - name: Pull latest Django backend image
       run: |
-        /home/ubuntu/martin/cleverspace_test_docker_ec2
+        cd /home/ubuntu/martin/cleverspace_test_docker_ec2
         sudo docker compose pull backend
 
     - name: Stop only the Django backend container
       run: |
-        /home/ubuntu/martin/cleverspace_test_docker_ec2
+        cd /home/ubuntu/martin/cleverspace_test_docker_ec2
         sudo docker compose stop backend
 
     - name: Start backend container with the latest image
       run: |
-        /home/ubuntu/martin/cleverspace_test_docker_ec2
+        cd /home/ubuntu/martin/cleverspace_test_docker_ec2
         sudo docker compose up -d backend
 
     - name: Remove unused Docker images 
