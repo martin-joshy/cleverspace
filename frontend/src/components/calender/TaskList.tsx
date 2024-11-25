@@ -45,6 +45,8 @@ export default function TaskList() {
   const status = useSelector((state: RootState) => state.tasks.status);
   const error = useSelector((state: RootState) => state.tasks.error);
 
+  console.log(editingTask);
+
   useEffect(() => {
     if (status === "idle") {
       dispatch(fetchTasks());
