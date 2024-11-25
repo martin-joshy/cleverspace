@@ -3,6 +3,7 @@ import {
   Calendar as BigCalendar,
   momentLocalizer,
   Event,
+  EventProps,
 } from "react-big-calendar";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
@@ -24,6 +25,15 @@ interface CalendarEvent extends Event {
   allDay: boolean;
   resource: Task;
 }
+
+// Custom event component with correct props type
+const EventComponent = ({ event }: EventProps<CalendarEvent>) => (
+  <div className="p-1">
+    <strong className="text-sm">{event.title}</strong>
+    <br />
+    <span className="text-xs">{moment(event.start).format("h:mm A")}</span>
+  </div>
+);
 
 export default function Calendar() {
   const dispatch = useDispatch<AppDispatch>();
@@ -77,19 +87,8 @@ export default function Calendar() {
           endAccessor="end"
           style={{ height: "100%" }}
           onSelectEvent={handleSelectEvent}
-          formats={{
-            eventTimeRangeFormat: () => null,
-          }}
           components={{
-            event: (props: { start: Date; title: string }) => (
-              <div className="p-1">
-                <strong className="text-sm">{props.title}</strong>
-                <br />
-                <span className="text-xs">
-                  {moment(props.start).format("h:mm A")}
-                </span>
-              </div>
-            ),
+            event: EventComponent,
           }}
           tooltipAccessor={(event: CalendarEvent) => event.title}
           popup
