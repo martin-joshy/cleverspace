@@ -1,11 +1,10 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
-from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import generics
 from django.contrib.auth.models import User
 
-from backend.task_scheduler.utils import success_response
+from task_scheduler.utils import success_response
 from .models import Task
 from .serializers import TaskSerializer, UserSerializer
 
