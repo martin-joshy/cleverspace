@@ -10,6 +10,10 @@ const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
+    path: "/",
+    element: <LoginPage />,
+  },
+  {
     path: "/logout",
     element: <Logout />,
   },
