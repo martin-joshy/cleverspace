@@ -11,7 +11,6 @@ import { Navbar } from "./Navbar";
 
 export default function Dashboard() {
   const dispatch = useDispatch<AppDispatch>();
-  const tasks = useSelector((state: RootState) => state.tasks.items);
   const status = useSelector((state: RootState) => state.tasks.status);
 
   useEffect(() => {
@@ -42,7 +41,7 @@ export default function Dashboard() {
             </div>
           </TabsContent>
           <TabsContent value="calendar">
-            <Calendar tasks={tasks} />
+            <Calendar />
           </TabsContent>
         </Tabs>
       </main>

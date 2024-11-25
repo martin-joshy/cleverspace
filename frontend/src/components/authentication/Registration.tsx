@@ -45,10 +45,7 @@ export const Registration: React.FC = () => {
         }
       }),
     confirm_password: Yup.string()
-      .oneOf(
-        [Yup.ref("password"), null],
-        "The two password fields didn't match."
-      )
+      .oneOf([Yup.ref("password"), ""], "The two password fields didn't match.")
       .required("This field is required."),
   });
 

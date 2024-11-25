@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+// "@ts-expect-error"
 import {
   Calendar as BigCalendar,
   momentLocalizer,
@@ -81,7 +82,7 @@ export default function Calendar() {
             eventTimeRangeFormat: () => null,
           }}
           components={{
-            event: (props) => (
+            event: (props: { start: Date; title: string }) => (
               <div className="p-1">
                 <strong className="text-sm">{props.title}</strong>
                 <br />
@@ -91,7 +92,7 @@ export default function Calendar() {
               </div>
             ),
           }}
-          tooltipAccessor={(event) => event.title}
+          tooltipAccessor={(event: CalendarEvent) => event.title}
           popup
           views={["month", "week", "day"]}
         />

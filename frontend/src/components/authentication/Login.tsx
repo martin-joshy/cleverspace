@@ -11,8 +11,8 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/utils/constants";
 
 interface LoginFormValues {
   email: string;
-  password?: string;
-  otp?: string;
+  password: string;
+  otp: string;
 }
 
 const PasswordLoginSchema = Yup.object().shape({
