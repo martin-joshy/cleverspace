@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-// "@ts-expect-error"
 import {
   Calendar as BigCalendar,
   momentLocalizer,
