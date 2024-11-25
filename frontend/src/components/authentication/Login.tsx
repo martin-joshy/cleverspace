@@ -2,12 +2,24 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Formik, Form, FormikHelpers } from "formik";
 import * as Yup from "yup";
-
 import { login, requestOTP, loginWithOTP } from "@/utils/api/publicApi";
 import { useTimer } from "@/../hooks/useTimer";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/utils/constants";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LogIn } from "lucide-react";
 
 interface LoginFormValues {
   email: string;
@@ -51,10 +63,6 @@ export const Login: React.FC = () => {
       navigate(location.pathname, { replace: true });
     }
   }, [location, toast, navigate]);
-
-  useEffect(() => {
-    console.log(loginMethod);
-  }, [loginMethod]);
 
   const handleSubmit = async (
     values: LoginFormValues,
@@ -117,143 +125,153 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Sign in to your account
-        </h2>
-        <div className="mt-8 space-y-6">
-          <div className="flex justify-center space-x-4">
-            <button
-              onClick={() => setLoginMethod("password")}
-              className={`px-4 py-2 text-sm font-medium rounded-md ${
-                loginMethod === "password"
-                  ? "bg-indigo-600 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-            >
-              Password
-            </button>
-            <button
-              onClick={() => setLoginMethod("otp")}
-              className={`px-4 py-2 text-sm font-medium rounded-md ${
-                loginMethod === "otp"
-                  ? "bg-indigo-600 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-            >
-              OTP
-            </button>
+    <Card className="border-none shadow-none bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <CardHeader className="space-y-1">
+        <div className="flex items-center justify-center mb-4">
+          <div className="p-3 rounded-full bg-primary/10">
+            <LogIn className="h-10 w-10 text-primary" />
           </div>
-
-          <Formik
-            initialValues={{
-              email: "",
-              password: "",
-              otp: "",
-            }}
-            validationSchema={
-              loginMethod === "password" ? PasswordLoginSchema : OTPLoginSchema
-            }
-            onSubmit={handleSubmit}
-          >
-            {({ isSubmitting, errors, touched, values, getFieldProps }) => (
-              <Form>
-                <div className="rounded-md shadow-sm -space-y-px">
-                  <div>
-                    <label htmlFor="email" className="sr-only">
-                      Email address
-                    </label>
-                    <input
+        </div>
+        <CardTitle className="text-3xl font-bold text-center">
+          Welcome back
+        </CardTitle>
+        <CardDescription className="text-center">
+          Sign in to your account to continue
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Tabs
+          value={loginMethod}
+          onValueChange={(value) => setLoginMethod(value as "password" | "otp")}
+        >
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="password">Password</TabsTrigger>
+            <TabsTrigger value="otp">OTP</TabsTrigger>
+          </TabsList>
+          <TabsContent value="password">
+            <Formik
+              initialValues={{
+                email: "",
+                password: "",
+                otp: "",
+              }}
+              validationSchema={PasswordLoginSchema}
+              onSubmit={handleSubmit}
+            >
+              {({ isSubmitting, errors, touched, getFieldProps }) => (
+                <Form className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email address</Label>
+                    <Input
                       id="email"
                       type="email"
                       autoComplete="email"
                       required
-                      className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                      placeholder="Email address"
                       {...getFieldProps("email")}
                     />
                     {touched.email && errors.email && (
-                      <div className="text-red-500 text-sm">{errors.email}</div>
+                      <p className="text-sm text-destructive">{errors.email}</p>
                     )}
                   </div>
-                  {loginMethod === "password" ? (
-                    <div>
-                      <label htmlFor="password" className="sr-only">
-                        Password
-                      </label>
-                      <input
-                        id="password"
-                        type="password"
-                        autoComplete="current-password"
-                        required
-                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                        placeholder="Password"
-                        {...getFieldProps("password")}
-                      />
-                      {touched.password && errors.password && (
-                        <div className="text-red-500 text-sm">
-                          {errors.password}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div>
-                      <label htmlFor="otp" className="sr-only">
-                        OTP
-                      </label>
-                      <input
-                        id="otp"
-                        type="text"
-                        autoComplete="one-time-code"
-                        required
-                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                        placeholder="One-Time Password"
-                        {...getFieldProps("otp")}
-                      />
-                      {touched.otp && errors.otp && (
-                        <div className="text-red-500 text-sm">{errors.otp}</div>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {loginMethod === "otp" && (
-                  <div className="mt-4">
-                    <button
-                      type="button"
-                      onClick={() => handleRequestOTP(values.email)}
-                      className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                      disabled={otpRequested && time > 0}
-                    >
-                      {otpRequested && time > 0
-                        ? `Resend OTP in ${time}s`
-                        : "Request OTP"}
-                    </button>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      autoComplete="current-password"
+                      required
+                      {...getFieldProps("password")}
+                    />
+                    {touched.password && errors.password && (
+                      <p className="text-sm text-destructive">
+                        {errors.password}
+                      </p>
+                    )}
                   </div>
-                )}
-
-                <div className="mt-4">
-                  <button
+                  {serverError && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{serverError}</AlertDescription>
+                    </Alert>
+                  )}
+                  <Button
                     type="submit"
+                    className="w-full"
                     disabled={isSubmitting}
-                    className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     {isSubmitting ? "Signing in..." : "Sign in"}
-                  </button>
-                </div>
-
-                {serverError && (
-                  <div className="mt-2 text-center text-sm text-red-600">
-                    {serverError}
+                  </Button>
+                </Form>
+              )}
+            </Formik>
+          </TabsContent>
+          <TabsContent value="otp">
+            <Formik
+              initialValues={{
+                email: "",
+                password: "",
+                otp: "",
+              }}
+              validationSchema={OTPLoginSchema}
+              onSubmit={handleSubmit}
+            >
+              {({ isSubmitting, errors, touched, values, getFieldProps }) => (
+                <Form className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email address</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      {...getFieldProps("email")}
+                    />
+                    {touched.email && errors.email && (
+                      <p className="text-sm text-destructive">{errors.email}</p>
+                    )}
                   </div>
-                )}
-              </Form>
-            )}
-          </Formik>
-        </div>
-      </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="otp">One-Time Password</Label>
+                    <Input
+                      id="otp"
+                      type="text"
+                      autoComplete="one-time-code"
+                      required
+                      {...getFieldProps("otp")}
+                    />
+                    {touched.otp && errors.otp && (
+                      <p className="text-sm text-destructive">{errors.otp}</p>
+                    )}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => handleRequestOTP(values.email)}
+                    disabled={otpRequested && time > 0}
+                  >
+                    {otpRequested && time > 0
+                      ? `Resend OTP in ${time}s`
+                      : "Request OTP"}
+                  </Button>
+                  {serverError && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{serverError}</AlertDescription>
+                    </Alert>
+                  )}
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Signing in..." : "Sign in"}
+                  </Button>
+                </Form>
+              )}
+            </Formik>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
       <Toaster />
-    </div>
+    </Card>
   );
 };

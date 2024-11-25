@@ -1,41 +1,31 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RootState, AppDispatch } from "@/store";
-import { fetchTasks } from "./taskSlice";
 import TaskForm from "./TaskForm";
 import TaskList from "./TaskList";
 import Calendar from "./Calendar";
 import { Navbar } from "./Navbar";
 
 export default function Dashboard() {
-  const dispatch = useDispatch<AppDispatch>();
-  const status = useSelector((state: RootState) => state.tasks.status);
-
-  useEffect(() => {
-    if (status === "idle") {
-      dispatch(fetchTasks());
-    }
-  }, [status, dispatch]);
-
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4">
-        <Tabs defaultValue="list" className="w-full">
+      <main className="container py-6">
+        <Tabs defaultValue="list" className="space-y-6">
           <TabsList>
             <TabsTrigger value="list">List View</TabsTrigger>
             <TabsTrigger value="calendar">Calendar View</TabsTrigger>
           </TabsList>
-          <TabsContent value="list">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h2 className="text-2xl font-semibold mb-4">Add New Task</h2>
+          <TabsContent value="list" className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-4">
+                <h2 className="text-2xl font-semibold tracking-tight">
+                  Create Task
+                </h2>
                 <TaskForm />
               </div>
-              <div>
-                <h2 className="text-2xl font-semibold mb-4">Task List</h2>
+              <div className="space-y-4">
+                <h2 className="text-2xl font-semibold tracking-tight">
+                  Your Tasks
+                </h2>
                 <TaskList />
               </div>
             </div>

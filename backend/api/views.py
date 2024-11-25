@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import generics
 from django.contrib.auth.models import User
+
+from backend.task_scheduler.utils import success_response
 from .models import Task
 from .serializers import TaskSerializer, UserSerializer
 
@@ -13,11 +15,12 @@ class TaskViewSet(ModelViewSet):
     serializer_class = TaskSerializer
 
     @action(detail=True, methods=["post"])
-    def mark_complete(self, request, pk=None):
+    def swap_complete(self):
         task = self.get_object()
-        task.is_completed = True
+        task.is_completed = not task.is_completed
         task.save()
-        return Response({"status": "Task marked as complete"})
+        serializer = TaskSerializer(task)
+        return success_response(message="Task updated", data=serializer.data)
 
 
 class CreateUserView(generics.CreateAPIView):

@@ -19,7 +19,7 @@ export default function ProtectedRoute({ children, authPage = false }: Props) {
   const refreshToken = async () => {
     const refreshToken = localStorage.getItem(REFRESH_TOKEN);
     try {
-      const res = await api.post("/api/user/token/refresh/", {
+      const res = await api.post("/api/auth/token/refresh/", {
         refresh: refreshToken,
       });
       if (res.status === 200) {

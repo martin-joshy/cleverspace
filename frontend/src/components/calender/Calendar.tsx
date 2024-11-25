@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Task } from "@/types/task";
 import { RootState, AppDispatch } from "@/store";
 import { fetchTasks } from "./taskSlice";
+import { cn } from "@/lib/utils";
 
 const localizer = momentLocalizer(moment);
 
@@ -26,12 +27,13 @@ interface CalendarEvent extends Event {
   resource: Task;
 }
 
-// Custom event component with correct props type
 const EventComponent = ({ event }: EventProps<CalendarEvent>) => (
-  <div className="p-1">
-    <strong className="text-sm">{event.title}</strong>
+  <div className="p-1 bg-primary/10 rounded-sm border border-primary/20 text-primary-foreground">
+    <strong className="text-xs font-medium">{event.title}</strong>
     <br />
-    <span className="text-xs">{moment(event.start).format("h:mm A")}</span>
+    <span className="text-[10px] opacity-75">
+      {moment(event.start).format("h:mm A")}
+    </span>
   </div>
 );
 
@@ -78,60 +80,71 @@ export default function Calendar() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row gap-4">
-      <div className="w-full md:w-3/4 h-[600px]">
-        <BigCalendar<CalendarEvent>
-          localizer={localizer}
-          events={events}
-          startAccessor="start"
-          endAccessor="end"
-          style={{ height: "100%" }}
-          onSelectEvent={handleSelectEvent}
-          components={{
-            event: EventComponent,
-          }}
-          tooltipAccessor={(event: CalendarEvent) => event.title}
-          popup
-          views={["month", "week", "day"]}
-        />
-      </div>
-      <div className="w-full md:w-1/4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Selected Task</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {selectedEvent ? (
-              <div className="space-y-3">
-                <h3 className="text-lg font-semibold">{selectedEvent.title}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {selectedEvent.description}
-                </p>
-                <div className="text-sm space-y-2">
-                  <p>
-                    Due:{" "}
+    <div className="flex flex-col lg:flex-row gap-6">
+      <Card className="w-full lg:w-3/4">
+        <CardHeader>
+          <CardTitle>Task Calendar</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[600px]">
+            <BigCalendar<CalendarEvent>
+              localizer={localizer}
+              events={events}
+              startAccessor="start"
+              endAccessor="end"
+              style={{ height: "100%" }}
+              onSelectEvent={handleSelectEvent}
+              components={{
+                event: EventComponent,
+              }}
+              tooltipAccessor={(event: CalendarEvent) => event.title}
+              popup
+              views={["month", "week", "day"]}
+              className="rounded-md border shadow-sm"
+            />
+          </div>
+        </CardContent>
+      </Card>
+      <Card className="w-full lg:w-1/4">
+        <CardHeader>
+          <CardTitle>Selected Task</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {selectedEvent ? (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">{selectedEvent.title}</h3>
+              <p className="text-sm text-muted-foreground">
+                {selectedEvent.description}
+              </p>
+              <div className="text-sm space-y-2">
+                <p className="flex items-center gap-2">
+                  <span className="font-medium">Due:</span>
+                  <span>
                     {moment(selectedEvent.scheduled_on).format(
                       "MMMM D, YYYY h:mm A"
                     )}
-                  </p>
-                  <Badge
-                    variant={
-                      selectedEvent.is_completed ? "secondary" : "default"
-                    }
-                    className="mt-2"
-                  >
-                    {selectedEvent.is_completed ? "Completed" : "Pending"}
-                  </Badge>
-                </div>
+                  </span>
+                </p>
+                <Badge
+                  variant={selectedEvent.is_completed ? "secondary" : "default"}
+                  className={cn(
+                    "mt-2",
+                    selectedEvent.is_completed
+                      ? "bg-green-100 text-green-800"
+                      : "bg-yellow-100 text-yellow-800"
+                  )}
+                >
+                  {selectedEvent.is_completed ? "Completed" : "Pending"}
+                </Badge>
               </div>
-            ) : (
-              <p className="text-muted-foreground">
-                Select a task to view details
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+            </div>
+          ) : (
+            <p className="text-muted-foreground">
+              Select a task to view details
+            </p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

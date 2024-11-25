@@ -32,5 +32,5 @@ export const taskApi = {
   updateTask: (id: string, task: TaskFormData) =>
     user_api.put(`api/task/${id}/`, task),
   deleteTask: (id: string) => user_api.delete(`api/task/${id}/`),
-  markComplete: (id: string) => user_api.post(`api/task/${id}/mark_complete/`),
+  markComplete: (id: string) => user_api.post(`api/task/${id}/swap_complete/`),
 };

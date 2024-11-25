@@ -2,14 +2,49 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form, FormikHelpers } from "formik";
 import * as Yup from "yup";
-
 import { register } from "@/utils/api/publicApi";
 import { validatePassword } from "@/utils/validators";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ClipboardList } from "lucide-react";
 
 interface RegistrationFormValues {
   email: string;
   password: string;
   confirm_password: string;
+}
+
+interface ApiErrorResponse {
+  success: boolean;
+  message: string;
+  errors?: {
+    email?: string[];
+  };
+}
+
+interface ApiError {
+  response: {
+    data: ApiErrorResponse;
+  };
+}
+
+function isApiError(error: unknown): error is ApiError {
+  return (
+    error !== null &&
+    typeof error === "object" &&
+    "response" in error &&
+    typeof (error as ApiError).response?.data === "object" &&
+    "success" in (error as ApiError).response.data
+  );
 }
 
 export const Registration: React.FC = () => {
@@ -31,11 +66,8 @@ export const Registration: React.FC = () => {
           }
           return true;
         } catch (err: unknown) {
-          if (err instanceof Error) {
-            setServerError(
-              (err as unknown as { response: { data: { message: string } } })
-                .response.data.message
-            );
+          if (isApiError(err)) {
+            setServerError(err.response.data.message);
           } else {
             setServerError(
               "An unexpected error occurred. Please try again later."
@@ -63,16 +95,15 @@ export const Registration: React.FC = () => {
           replace: true,
         });
       } catch (error: unknown) {
-        if (
-          error &&
-          typeof error === "object" &&
-          "response" in error &&
-          (error as unknown as { response: { data: string } }).response.data
-        ) {
-          const responseErrors = (
-            error as unknown as { response: { data: { message: string } } }
-          ).response.data.message;
-          setServerError(responseErrors);
+        if (isApiError(error)) {
+          if (
+            error.response.data.errors?.email &&
+            error.response.data.errors.email.length > 0
+          ) {
+            setServerError(error.response.data.errors.email[0]);
+          } else if (error.response.data.message) {
+            setServerError(error.response.data.message);
+          }
         } else {
           setServerError(
             "An unexpected error occurred. Please try again later."
@@ -86,11 +117,21 @@ export const Registration: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Register an account
-        </h2>
+    <Card className="border-none shadow-none bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <CardHeader className="space-y-1">
+        <div className="flex items-center justify-center mb-4">
+          <div className="p-3 rounded-full bg-primary/10">
+            <ClipboardList className="h-10 w-10 text-primary" />
+          </div>
+        </div>
+        <CardTitle className="text-3xl font-bold text-center">
+          Create an account
+        </CardTitle>
+        <CardDescription className="text-center">
+          Enter your details to get started with Task Manager
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
         <Formik
           initialValues={{
             email: "",
@@ -101,79 +142,60 @@ export const Registration: React.FC = () => {
           onSubmit={handleSubmit}
         >
           {({ isSubmitting, errors, touched, getFieldProps }) => (
-            <Form className="mt-8 space-y-6">
-              <div className="rounded-md shadow-sm -space-y-px">
-                <div>
-                  <label htmlFor="email-address" className="sr-only">
-                    Email address
-                  </label>
-                  <input
-                    id="email-address"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                    placeholder="Email address"
-                    {...getFieldProps("email")}
-                  />
-                  {touched.email && errors.email && (
-                    <div className="text-red-500 text-sm">{errors.email}</div>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="password" className="sr-only">
-                    Password
-                  </label>
-                  <input
-                    id="password"
-                    type="password"
-                    autoComplete="new-password"
-                    required
-                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                    placeholder="Password"
-                    {...getFieldProps("password")}
-                  />
-                  {touched.password && errors.password && (
-                    <div className="text-red-500 text-sm">
-                      {errors.password}
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="confirm-password" className="sr-only">
-                    Confirm Password
-                  </label>
-                  <input
-                    id="confirm-password"
-                    type="password"
-                    autoComplete="new-password"
-                    required
-                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                    placeholder="Confirm Password"
-                    {...getFieldProps("confirm_password")}
-                  />
-                  {touched.confirm_password && errors.confirm_password && (
-                    <div className="text-red-500 text-sm">
-                      {errors.confirm_password}
-                    </div>
-                  )}
-                </div>
+            <Form className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email-address">Email address</Label>
+                <Input
+                  id="email-address"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  {...getFieldProps("email")}
+                />
+                {touched.email && errors.email && (
+                  <p className="text-sm text-destructive">{errors.email}</p>
+                )}
               </div>
-              {serverError && <div className="text-red-600">{serverError}</div>}
-
-              <div>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  {isSubmitting ? "Registering..." : "Register"}
-                </button>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  {...getFieldProps("password")}
+                />
+                {touched.password && errors.password && (
+                  <p className="text-sm text-destructive">{errors.password}</p>
+                )}
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">Confirm Password</Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  {...getFieldProps("confirm_password")}
+                />
+                {touched.confirm_password && errors.confirm_password && (
+                  <p className="text-sm text-destructive">
+                    {errors.confirm_password}
+                  </p>
+                )}
+              </div>
+              {serverError && (
+                <Alert variant="destructive">
+                  <AlertDescription>{serverError}</AlertDescription>
+                </Alert>
+              )}
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? "Registering..." : "Register"}
+              </Button>
             </Form>
           )}
         </Formik>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };

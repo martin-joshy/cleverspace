@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { addTask, updateTask } from "./taskSlice";
 import { AppDispatch } from "@/store";
 import { Task, TaskFormData } from "@/types/task";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type TaskFormProps = {
   initialTask?: Task;
@@ -55,46 +56,57 @@ export default function TaskForm({ initialTask, onComplete }: TaskFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <Input
-        placeholder="Task title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        required
-      />
-      <Textarea
-        placeholder="Task description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-      <div className="relative">
-        <DatePicker
-          selected={dueDate}
-          onChange={(date: Date | null) => setDueDate(date)}
-          showTimeSelect
-          timeFormat="HH:mm"
-          timeIntervals={15}
-          dateFormat="MMMM d, yyyy h:mm aa"
-          customInput={
-            <Button
-              type="button"
-              variant="outline"
-              className={cn(
-                "w-full justify-start text-left font-normal",
-                !dueDate && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {dueDate ? (
-                format(dueDate, "PPP p")
-              ) : (
-                <span>Pick a date and time</span>
-              )}
-            </Button>
-          }
-        />
-      </div>
-      <Button type="submit">{initialTask ? "Update Task" : "Add Task"}</Button>
-    </form>
+    <Card>
+      <CardHeader>
+        <CardTitle>{initialTask ? "Update Task" : "Create New Task"}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Input
+              placeholder="Task title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              className="h-9"
+            />
+          </div>
+          <div className="space-y-2">
+            <Textarea
+              placeholder="Task description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="min-h-[100px] resize-none"
+            />
+          </div>
+          <div className="relative">
+            <DatePicker
+              selected={dueDate}
+              onChange={(date: Date | null) => setDueDate(date)}
+              showTimeSelect
+              timeFormat="HH:mm"
+              timeIntervals={15}
+              dateFormat="MMMM d, yyyy h:mm aa"
+              customInput={
+                <Button
+                  type="button"
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !dueDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dueDate ? format(dueDate, "PPP p") : "Pick a date and time"}
+                </Button>
+              }
+            />
+          </div>
+          <Button type="submit" className="w-full">
+            {initialTask ? "Update Task" : "Create Task"}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

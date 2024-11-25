@@ -76,7 +76,7 @@ class RequestOTPView(APIView):
 
         if not created and otp_obj.remaining_seconds <= 0:
             otp_obj.refresh(otp_code)
-        else:
+        elif not created and otp_obj.remaining_seconds > 0:
             return error_response(
                 errors=None,
                 message=f"OTP already sent. Please wait for {otp_obj.remaining_seconds} seconds",
