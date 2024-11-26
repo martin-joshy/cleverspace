@@ -14,7 +14,7 @@ class TaskViewSet(ModelViewSet):
     serializer_class = TaskSerializer
 
     @action(detail=True, methods=["post"])
-    def swap_complete(self):
+    def swap_complete(self, request, pk=None):
         task = self.get_object()
         task.is_completed = not task.is_completed
         task.save()
